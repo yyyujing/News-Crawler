@@ -1,0 +1,240 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+```{r}
+library("rvest")
+library(stringr)
+library(magrittr)
+url <- "http://www.chyxx.com/news/" #产业信息网
+web <- read_html(url,encoding = 'gbk')
+
+#提取htmLnodes
+news <- web%>%html_nodes("div.hotnews")%>%html_nodes("ul.list")%>%html_nodes("a") #注意这里有两级类名的，可以直接用第一类的 
+#提取新闻标题存入title
+title<- news%>%html_text()
+#提取网页的url存入link
+link <- news%>%html_attr("href")
+
+
+for(i in 1:length(link)){
+  if( str_detect(link[i],"http")==FALSE)
+    link[i]<-str_c("http://www.chyxx.com",link[i])
+}
+
+
+article <- c(1:length(link))
+article[]<-""
+
+for(i in 1:length(link)) #抓取所有提取的新闻的内容
+{
+  x<-try(read_html(link[i]),silent = TRUE)
+  if("try-error" %in% class(x))  next  #捕获异常并跳过此次循环，注意这里不用else 
+  web<-read_html(link[i]) 
+  article_nodes<-web%>%html_nodes("div.articleBody p")  
+  paras<-article_nodes%>%html_text()  
+  article[i]<-paste(paras[1:length(paras)],collapse = "")
+  
+}
+
+
+artempty<-str_detect(article,"") #这里是要删除为空值的文章
+
+for(i in 1:length(artempty)){
+  if (artempty[i]== FALSE ){
+    link[i]<-NA
+    title[i]<-NA
+    article[i]<-NA
+  }
+}
+
+link<-na.omit(link)
+title<-na.omit(title)
+article<-na.omit(article)
+
+
+artempty<-str_detect(article,"NA") #删掉为NA的文章
+
+for(i in 1:length(artempty)){
+  if (artempty[i]== TRUE ){
+    link[i]<-NA
+    title[i]<-NA
+    article[i]<-NA
+  }
+}
+
+link<-na.omit(link)
+title<-na.omit(title)
+article<-na.omit(article)
+
+
+
+newsdata<-data.frame(link=link,title=title,article=article)
+write.csv(newsdata,file = "newschanyexinxi.csv",fileEncoding = "UTF-8",row.names = FALSE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library("rvest")
+library(stringr)
+library(magrittr)
+url <- "http://www.cinn.cn/" #产业信息网
+web <- read_html(url)
+
+#提取htmLnodes
+news <- web%>%html_nodes("div.news2")%>%html_nodes("a") #注意这里有两级类名的，可以直接用第一类的 
+#提取新闻标题存入title
+title<- news%>%html_text()
+#提取网页的url存入link
+link <- news%>%html_attr("href")
+
+link<-sub(pattern = './',replacement = '/',link)
+
+
+for(i in 1:length(link)){
+  if( str_detect(link[i],"http")==FALSE)
+    link[i]<-str_c("http://www.cinn.cn",link[i])
+}
+
+
+
+article <- c(1:length(link))
+article[]<-""
+
+for(i in 1:length(link)) #抓取所有提取的新闻的内容
+{
+  x<-try(read_html(link[i]),silent = TRUE)
+  if("try-error" %in% class(x))  next  #捕获异常并跳过此次循环，注意这里不用else 
+  web<-read_html(link[i]) 
+  article_nodes<-web%>%html_nodes("div.detail_content p")  
+  paras<-article_nodes%>%html_text()  
+  article[i]<-paste(paras[1:length(paras)],collapse = "")
+}
+
+artempty<-str_detect(article,"") #这里是要删除为空值的文章
+
+for(i in 1:length(artempty)){
+  if (artempty[i]== FALSE ){
+    link[i]<-NA
+    title[i]<-NA
+    article[i]<-NA
+  }
+}
+
+link<-na.omit(link)
+title<-na.omit(title)
+article<-na.omit(article)
+
+
+artempty<-str_detect(article,"NA") #删掉为NA的文章
+
+for(i in 1:length(artempty)){
+  if (artempty[i]== TRUE ){
+    link[i]<-NA
+    title[i]<-NA
+    article[i]<-NA
+  }
+}
+
+link<-na.omit(link)
+title<-na.omit(title)
+article<-na.omit(article)
+
+
+newsdata<-data.frame(link=link,title=title,article=article)
+write.csv(newsdata,file = "newsgongyexinwen.csv",fileEncoding = "UTF-8",row.names = FALSE)
+```
+
+## Including Plots
+
+crawler for eeword
+
+```{r}
+library("rvest")
+library(stringr)
+library(magrittr)
+url <- "http://www.eeworld.com.cn/gykz/zhzx/" #电子工程网
+web <- read_html(url)
+
+#提取htmLnodes
+news1 <- web%>%html_nodes("div.chan_toptxt")%>%html_nodes("a") #注意这里有两级类名的，可以直接用第一类的 
+#提取新闻标题存入title
+title1<- news1%>%html_text()
+#提取网页的url存入link
+link1 <- news1%>%html_attr("href")
+
+
+#提取htmLnodes
+news2 <- web%>%html_nodes("dt.tit")%>%html_nodes("a") #注意这里有两级类名的，可以直接用第一类的 
+#提取新闻标题存入title
+title2<- news2%>%html_text()
+#提取网页的url存入link
+link2 <- news2%>%html_attr("href")
+
+#提取htmLnodes
+news3 <- web%>%html_nodes("div.newspdail.boxm4")%>%html_nodes("a") #注意这里有两级类名的，可以直接用第一类的 
+#提取新闻标题存入title
+title3<- news3%>%html_text()
+#提取网页的url存入link
+link3 <- news3%>%html_attr("href")
+
+title<-title1%>%append(title2)%>%append(title3)
+link<-link1%>%append(link2)%>%append(link3)
+
+
+article <- c(1:length(link))
+article[]<-""
+
+for(i in 1:length(link)) #抓取所有提取的新闻的内容
+{
+  x<-try(read_html(link[i]),silent = TRUE)
+  if("try-error" %in% class(x))  next  #捕获异常并跳过此次循环，注意这里不用else 
+  web<-read_html(link[i]) 
+  article_nodes<-web%>%html_nodes("div.newscontxt p")  
+  paras<-article_nodes%>%html_text()  
+  article[i]<-paste(paras[1:length(paras)],collapse = "")
+  print(i)
+}
+
+artempty<-str_detect(article,"") #这里是要删除为空值的文章
+
+for(i in 1:length(artempty)){
+  if (artempty[i]== FALSE ){
+    link[i]<-NA
+    title[i]<-NA
+    article[i]<-NA
+  }
+}
+
+link<-na.omit(link)
+title<-na.omit(title)
+article<-na.omit(article)
+
+
+artempty<-str_detect(article,"NA") #删掉为NA的文章
+
+for(i in 1:length(artempty)){
+  if (artempty[i]== TRUE ){
+    link[i]<-NA
+    title[i]<-NA
+    article[i]<-NA
+  }
+}
+
+link<-na.omit(link)
+title<-na.omit(title)
+article<-na.omit(article)
+
+
+
+newsdata<-data.frame(link=link,title=title,article=article)
+write.csv(newsdata,file = "newsdianzigongchen.csv",fileEncoding = "UTF-8",row.names = FALSE)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
